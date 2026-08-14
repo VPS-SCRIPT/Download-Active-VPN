@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="my" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Active VPN - Premium Internet Service</title>
+    <!-- Tailwind CSS with custom config for Dark Mode -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {}
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Padauk:wght@400;700&display=swap');
+        body { font-family: 'Padauk', sans-serif; scroll-behavior: smooth; }
+        body * { transition-property: background-color, border-color, color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 300ms; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        @keyframes android-bounce {
+            0%, 100% { transform: translateY(0) rotate(0); }
+            25% { transform: translateY(-4px) rotate(-10deg); }
+            50% { transform: translateY(-6px) rotate(10deg); }
+            75% { transform: translateY(-4px) rotate(-10deg); }
+        }
+        .animate-android { animation: android-bounce 2s ease-in-out infinite; display: inline-block; }
+        .modal-enter { opacity: 0; transform: scale(0.9); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 300ms, transform 300ms; }
+        .modal-leave { opacity: 1; transform: scale(1); }
+        .modal-leave-active { opacity: 0; transform: scale(0.9); transition: opacity 300ms, transform 300ms; }
+    </style>
+    
+    <!-- SECURITY SCRIPT: Anti-Right Click & Anti-DevTools -->
+    <script>
+        // Disable Right Click
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        // Disable Keyboard Shortcuts
+        document.onkeydown = function(e) {
+            if(e.keyCode == 123) return false; // F12
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) return false; // Ctrl+Shift+I
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'C'.charCodeAt(0)) return false; // Ctrl+Shift+C
+            if(e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) return false; // Ctrl+Shift+J
+            if(e.ctrlKey && e.keyCode == 'U'.charCodeAt(0)) return false; // Ctrl+U
+        }
+        // Anti-Debugger Loop (Freezes Kiwi/DevTools)
+        setInterval(function() {
+            (function() { return false; }['constructor']('debugger')());
+        }, 500);
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen flex flex-col relative">
+
+    <!-- Theme Toggle Floating Button -->
+    <button id="theme-toggle" class="fixed bottom-6 right-6 z-40 p-4 rounded-full bg-blue-600 hover:bg-blue-700 text-white shadow-lg transition-transform transform hover:scale-110 focus:outline-none flex items-center justify-center w-14 h-14">
+        <i id="theme-icon" class="fa-solid fa-moon text-2xl"></i>
+    </button>
+
+    <!-- Password Modal -->
+    <div id="password-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+        <div class="bg-white dark:bg-gray-800 w-full max-w-sm rounded-2xl shadow-2xl p-6 transform transition-all border border-gray-200 dark:border-gray-700">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                    <i class="fa-solid fa-lock text-green-500"></i> Password ရိုက်ထည့်ပါ
+                </h3>
+                <button id="close-modal" class="text-gray-400 hover:text-red-500 transition-colors">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+            
+            <p class="text-gray-600 dark:text-gray-400 text-sm mb-4">APK ကို ဒေါင်းလုဒ်ဆွဲရန် စကားဝှက်လိုအပ်ပါသည်။</p>
+            
+            <div class="mb-4 relative">
+                <input type="password" id="apk-password" placeholder="Password..." 
+                       class="w-full bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white rounded-lg focus:ring-green-500 focus:border-green-500 block p-3 pr-10">
+                <button type="button" id="toggle-password" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                    <i class="fa-solid fa-eye" id="eye-icon"></i>
+                </button>
+            </div>
+            
+            <p id="password-error" class="text-red-500 text-sm mb-4 hidden"><i class="fa-solid fa-circle-exclamation"></i> Password မှားယွင်းနေပါသည်!</p>
+            
+            <button id="verify-download" class="w-full bg-gradient-to-r from-green-600 to-green-400 hover:from-green-700 hover:to-green-500 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-colors flex justify-center items-center gap-2">
+                <i class="fa-solid fa-cloud-arrow-down"></i> အတည်ပြု၍ ဒေါင်းလုဒ်လုပ်မည်
+            </button>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="sticky top-0 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md dark:shadow-lg border-b border-gray-200 dark:border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-center sm:justify-start h-16 sm:h-20">
+                <div class="flex items-center gap-3">
+                    <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn.net/refs/heads/main/image/1786624647999.png" alt="Active VPN Logo" class="h-10 w-10 sm:h-14 sm:w-14 object-cover rounded-full shadow-md border-2 border-green-500">
+                    <h1 class="text-xl sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-green-600 to-emerald-500 dark:from-green-400 dark:to-emerald-400">Active VPN</h1>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Friendly Navigation Buttons Row -->
+        <div class="max-w-7xl mx-auto px-3 pb-3 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
+                <a href="#download" class="whitespace-nowrap flex-1 flex items-center justify-center gap-1.5 bg-green-100 hover:bg-green-200 text-green-700 dark:bg-green-900/40 dark:hover:bg-green-800/60 dark:text-green-300 px-2 py-2 rounded-xl text-[12px] sm:text-sm md:text-base font-semibold transition-colors border border-green-200 dark:border-green-800/50 shadow-sm">
+                    <i class="fa-solid fa-download"></i> Download APK
+                </a>
+                <a href="#instructions" class="whitespace-nowrap flex-1 flex items-center justify-center gap-1.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 dark:bg-emerald-900/40 dark:hover:bg-emerald-800/60 dark:text-emerald-300 px-2 py-2 rounded-xl text-[12px] sm:text-sm md:text-base font-semibold transition-colors border border-emerald-200 dark:border-emerald-800/50 shadow-sm">
+                    <i class="fa-solid fa-book-open"></i> အသုံးပြုနည်း
+                </a>
+                <a href="#plans" class="whitespace-nowrap flex-1 flex items-center justify-center gap-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 dark:bg-purple-900/40 dark:hover:bg-purple-800/60 dark:text-purple-300 px-2 py-2 rounded-xl text-[12px] sm:text-sm md:text-base font-semibold transition-colors border border-purple-200 dark:border-purple-800/50 shadow-sm">
+                    <i class="fa-solid fa-sim-card"></i> SIM (ပေကေ့များ)
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        
+        <!-- Hero & Download Section -->
+        <section id="download" class="scroll-mt-32 py-12 px-4 sm:px-6 lg:px-8 text-center bg-gradient-to-b from-blue-50 to-white dark:from-gray-800 dark:to-gray-900">
+            <h2 class="text-3xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white leading-tight">
+                အကောင်းဆုံး အင်တာနက် အတွေ့အကြုံအတွက် <br class="hidden md:block"> Active VPN
+            </h2>
+            <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mb-10 text-lg">
+                အကန့်အသတ်မရှိ (Unlimited) အင်တာနက်ကို မြန်နှုန်းမြင့်မြင့်နဲ့ အသုံးပြုနိုင်ဖို့ ယခုပဲ ဒေါင်းလုဒ်ရယူလိုက်ပါ။
+            </p>
+            
+            <!-- App Info Card -->
+            <div class="max-w-md mx-auto bg-white dark:bg-white/5 backdrop-blur-md rounded-2xl shadow-lg border border-gray-200 dark:border-white/10 p-6 mb-10 text-left">
+                <!-- Header of the card -->
+                <div class="flex items-center gap-4 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
+                    <img src="https://raw.githubusercontent.com/VPS-SCRIPT/activevpn.net/refs/heads/main/image/1786624647999.png" alt="Active VPN App Logo" class="h-16 w-16 object-cover rounded-xl shadow-sm">
+                    <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Active VPN</h3>
+                </div>
+                
+                <!-- Details list -->
+                <div class="space-y-4 text-sm md:text-base">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2"><i class="fa-solid fa-code-branch text-blue-500 w-5"></i> Version:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">1.0.0 (23)</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2"><i class="fa-solid fa-hard-drive text-blue-500 w-5"></i> Size:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">68.48 MB</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2"><i class="fa-solid fa-box text-blue-500 w-5"></i> Package Name:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">active.vpn.pro</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2"><i class="fa-solid fa-bullseye text-blue-500 w-5"></i> Target Version:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200">35</span>
+                    </div>
+                    <div class="flex justify-between items-center gap-2">
+                        <span class="text-gray-500 dark:text-gray-400 flex items-center gap-2 whitespace-nowrap"><i class="fa-solid fa-fingerprint text-blue-500 w-5"></i> Sign MD5:</span>
+                        <span class="font-medium text-gray-900 dark:text-gray-200 text-[11px] sm:text-sm truncate" title="828c8d09b2b5bba9301dcefb9987d8bc">828c8d09b2b5bba9301dcefb9987d8bc</span>
+                    </div>
+                </div>
+            </div>
+
+            <button id="open-download-modal" 
+               class="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-green-600 to-green-400 hover:from-green-700 hover:to-green-500 text-white text-lg font-bold py-4 px-8 rounded-full shadow-lg shadow-green-500/40 transition-all transform hover:scale-105 active:scale-95 focus:outline-none">
+                <i class="fa-brands fa-android text-2xl animate-android"></i>
+                <span style="text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">Download App (APK)</span>
+            </button>
+        </section>
+
+        <!-- Instructions Section (အသုံးပြုနည်း) -->
+        <section id="instructions" class="scroll-mt-32 py-12 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-10">
+                <h3 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    <i class="fa-solid fa-book-open text-blue-500 dark:text-blue-400 mr-2"></i> အသုံးပြုနည်း
+                </h3>
+                <div class="h-1 w-20 bg-blue-500 mx-auto rounded"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Step 1 -->
+                <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 rounded-2xl flex flex-col items-center text-center">
+                    <div class="h-16 w-16 bg-blue-100 dark:bg-blue-500/20 rounded-full flex items-center justify-center mb-4 text-blue-600 dark:text-blue-400">
+                        <i class="fa-solid fa-download text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">အဆင့် (၁)</h4>
+                    <p class="text-gray-600 dark:text-gray-300">အထက်ပါ Download Link မှ ဆော့ဝဲကူးပြီး ဝင်ပါ။</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 rounded-2xl flex flex-col items-center text-center">
+                    <div class="h-16 w-16 bg-yellow-100 dark:bg-yellow-500/20 rounded-full flex items-center justify-center mb-4 text-yellow-600 dark:text-yellow-400">
+                        <i class="fa-solid fa-crown text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">အဆင့် (၂)</h4>
+                    <p class="text-gray-600 dark:text-gray-300">ဆော့ဝဲထဲရောက်ပါက <strong>VIP ပုံလေး</strong> ကို နှိပ်ပါ။</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 rounded-2xl flex flex-col items-center text-center">
+                    <div class="h-16 w-16 bg-purple-100 dark:bg-purple-500/20 rounded-full flex items-center justify-center mb-4 text-purple-600 dark:text-purple-400">
+                        <i class="fa-regular fa-copy text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">အဆင့် (၃)</h4>
+                    <p class="text-gray-600 dark:text-gray-300"><strong>"Your Device ID"</strong> ဆိုတာလေးကို Copy ယူပြီး Admin ထံ ပို့ပေးပါ။</p>
+                </div>
+                <!-- Step 4 -->
+                <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 rounded-2xl flex flex-col items-center text-center lg:col-span-2">
+                    <div class="h-16 w-16 bg-green-100 dark:bg-green-500/20 rounded-full flex items-center justify-center mb-4 text-green-600 dark:text-green-400">
+                        <i class="fa-solid fa-arrows-rotate text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">အဆင့် (၄)</h4>
+                    <p class="text-gray-600 dark:text-gray-300">Admin ကရပြီဆိုရင် ID အပေါ်က <strong>မျှားအကွေးလေး နှိပ်ပါ</strong>။ သို့မဟုတ် ဆော့ဝဲထွက်ပြီး ပြန်ဝင်ပါ။<br> <span class="text-sm text-yellow-600 dark:text-yellow-500 mt-2 block font-medium">(မှတ်ချက် - အင်တာနက် ခဏရှိရပါမည်။)</span></p>
+                </div>
+                <!-- Step 5 -->
+                <div class="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 shadow-sm dark:shadow-none p-6 rounded-2xl flex flex-col items-center text-center">
+                    <div class="h-16 w-16 bg-pink-100 dark:bg-pink-500/20 rounded-full flex items-center justify-center mb-4 text-pink-600 dark:text-pink-400">
+                        <i class="fa-solid fa-user-check text-2xl"></i>
+                    </div>
+                    <h4 class="text-xl font-bold mb-2 text-gray-900 dark:text-white">အဆင့် (၅)</h4>
+                    <p class="text-gray-600 dark:text-gray-300">Date တွေ ဝင်လာရင် သုံးရပါပြီ။ ညာဘက်ထိပ်က <strong>လူပုံ နှိပ်ပြီး</strong> သက်တမ်းနဲ့ အသုံးပြုထားတဲ့ GB တွေကို ကြည့်နိုင်ပါတယ်။</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pricing / Plans Section -->
+        <section id="plans" class="scroll-mt-32 py-16 bg-gray-100 dark:bg-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-12">
+                    <h3 class="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">ရရှိနိုင်သော ပက်ကေ့ချ်များ</h3>
+                    <div class="h-1 w-20 bg-blue-500 mx-auto rounded"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- DTAC Card -->
+                    <div class="relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg dark:shadow-xl border-t-4 border-cyan-500 dark:border-cyan-400 transform transition hover:-translate-y-2">
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-xl font-bold text-cyan-600 dark:text-cyan-400">DTAC NOPRO PREMIUM</h4>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXIB1stuxiDc1L4kBzwhYIMgrw-_uw78xbw0gX7ob0RA&s=10" alt="DTAC" class="w-12 h-12 rounded-full object-cover border-2 border-cyan-400 shadow-sm">
+                            </div>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-gray-900 dark:text-white">70</span>
+                                <span class="text-gray-600 dark:text-gray-400 ml-1">ဘတ် / 1 Month</span>
+                            </div>
+                            <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-circle-check text-cyan-500 dark:text-cyan-400 mt-1"></i><span>Unlimited GB (အကန့်အသတ်မရှိ)</span></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-gamepad text-cyan-500 dark:text-cyan-400 mt-1"></i><span>Support Game (ဂိမ်းဆော့နိုင်သည်)</span></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-globe text-cyan-500 dark:text-cyan-400 mt-1"></i><span>All Social Media Working</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- TRUE Card -->
+                    <div class="relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg dark:shadow-xl border-t-4 border-red-500 transform transition hover:-translate-y-2">
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-xl font-bold text-red-600 dark:text-red-500">TRUE NOPRO PREMIUM</h4>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTza76zH0mhlAJb_aJjAiSN6UbUW3wT36DWbYMFj4WC2g&s" alt="TRUE" class="w-12 h-12 rounded-full object-cover border-2 border-red-500 shadow-sm">
+                            </div>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-gray-900 dark:text-white">70</span>
+                                <span class="text-gray-600 dark:text-gray-400 ml-1">ဘတ် / 1 Month</span>
+                            </div>
+                            <ul class="space-y-4 text-gray-700 dark:text-gray-300">
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-circle-check text-red-500 mt-1"></i><span>Unlimited GB (အကန့်အသတ်မရှိ)</span></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-circle-xmark text-gray-400 dark:text-gray-500 mt-1"></i><span class="text-gray-500 dark:text-gray-400 line-through">Game Not Supported</span></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-globe text-red-500 mt-1"></i><span>Social Media Working</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <!-- AIS Card -->
+                    <div class="relative bg-white dark:bg-gray-900 rounded-2xl overflow-hidden shadow-lg dark:shadow-xl border-t-4 border-green-500 transform transition hover:-translate-y-2">
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-4">
+                                <h4 class="text-xl font-bold text-green-600 dark:text-green-500">AIS 64/128 KBPS <br> PREMIUM</h4>
+                                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ80DLSDSsJ1ICkuOFBtEtKq7svmM1KabvKePHc5YO4tQ&s=10" alt="AIS" class="w-12 h-12 rounded-full object-cover border-2 border-green-500 shadow-sm bg-white">
+                            </div>
+                            <div class="mb-6">
+                                <span class="text-4xl font-extrabold text-gray-900 dark:text-white">50</span>
+                                <span class="text-gray-600 dark:text-gray-400 ml-1">THB / 1 Month</span>
+                            </div>
+                            <ul class="space-y-3 text-gray-700 dark:text-gray-300">
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-circle-check text-green-500 mt-1"></i><span>Unlimited GB (အကန့်အသတ်မရှိ)</span></li>
+                                <li class="flex items-start gap-3"><i class="fa-solid fa-gamepad text-green-500 mt-1"></i><span>Some Game Support</span></li>
+                            </ul>
+                            <div class="mt-6 p-4 bg-green-50 dark:bg-green-900/30 rounded-xl border border-green-200 dark:border-green-800/50">
+                                <p class="text-sm font-bold text-green-700 dark:text-green-400 mb-2"><i class="fa-solid fa-asterisk mr-1"></i> စမတ်တခု ရှိရမည်</p>
+                                <ul class="text-sm space-y-2 text-gray-600 dark:text-gray-400">
+                                    <li class="flex justify-between border-b border-gray-200 dark:border-gray-700 pb-1">
+                                        <span>*777*7067#</span> <span class="font-medium">29 ဘတ်</span>
+                                    </li>
+                                    <li class="flex justify-between pt-1">
+                                        <span>*777*7068#</span> <span class="font-medium">33 ဘတ်</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-200 dark:bg-gray-950 py-6 text-center border-t border-gray-300 dark:border-gray-800">
+        <p class="text-gray-600 dark:text-gray-500">&copy; 2026 Active VPN. All rights reserved.</p>
+    </footer>
+
+    <!-- OBFUSCATED & MINIFIED JAVASCRIPT -->
+    <script>
+        !function(){const e=document.getElementById("theme-toggle"),t=document.getElementById("theme-icon");"dark"===localStorage.getItem("color-theme")||!("color-theme"in localStorage)&&window.matchMedia("(prefers-color-scheme: dark)").matches?(document.documentElement.classList.add("dark"),t.classList.replace("fa-moon","fa-sun")):(document.documentElement.classList.remove("dark"),t.classList.replace("fa-sun","fa-moon")),e.addEventListener("click",(function(){document.documentElement.classList.toggle("dark"),document.documentElement.classList.contains("dark")?(localStorage.setItem("color-theme","dark"),t.classList.replace("fa-moon","fa-sun")):(localStorage.setItem("color-theme","light"),t.classList.replace("fa-sun","fa-moon"))}));const o=document.getElementById("open-download-modal"),s=document.getElementById("password-modal"),n=document.getElementById("close-modal"),c=document.getElementById("apk-password"),d=document.getElementById("verify-download"),a=document.getElementById("password-error"),r=document.getElementById("toggle-password"),l=document.getElementById("eye-icon");function m(){s.classList.remove("hidden"),s.classList.add("flex"),c.value="",a.classList.add("hidden"),setTimeout((()=>c.focus()),100)}function i(){s.classList.add("hidden"),s.classList.remove("flex")}function u(){const e=c.value.trim();if(function(e){const t=[195,201,252,219,258,207,150,144,150,162];if(e.length!==t.length)return!1;for(let o=0;o<e.length;o++)if(3*e.charCodeAt(o)!==t[o])return!1;return!0}(e)){a.classList.add("hidden");const e=d.innerHTML;d.innerHTML='<i class="fa-solid fa-check"></i> မှန်ကန်ပါသည်...',d.classList.replace("from-green-600","from-blue-600"),d.classList.replace("to-green-400","to-blue-400"),setTimeout((()=>{window.location.href=atob("aHR0cHM6Ly9naXRodWIuY29tL1ZQUy1TQ1JJUFQvYWN0aXZldnBuLm5ldC9yZWxlYXNlcy9kb3dubG9hZC9BY3RpdmVfVlBOXzEuMC4wL0FjdGl2ZS5WUE5fMS4wLjAuYXBr"),i(),setTimeout((()=>{d.innerHTML=e,d.classList.replace("from-blue-600","from-green-600"),d.classList.replace("to-blue-400","to-green-400")}),500)}),800)}else a.classList.remove("hidden"),c.classList.add("border-red-500"),c.style.transform="translateX(-5px)",setTimeout((()=>c.style.transform="translateX(5px)"),100),setTimeout((()=>c.style.transform="translateX(-5px)"),200),setTimeout((()=>c.style.transform="translateX(0)"),300)}o.addEventListener("click",m),n.addEventListener("click",i),s.addEventListener("click",(e=>{e.target===s&&i()})),r.addEventListener("click",(()=>{console.log("Toggle");"password"===c.type?(c.type="text",l.classList.replace("fa-eye","fa-eye-slash")):(c.type="password",l.classList.replace("fa-eye-slash","fa-eye"))})),d.addEventListener("click",u),c.addEventListener("keypress",(e=>{"Enter"===e.key&&u(),c.classList.remove("border-red-500"),a.classList.add("hidden")}))}();
+    </script>
+</body>
+</html>
+
